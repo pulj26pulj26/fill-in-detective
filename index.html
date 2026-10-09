@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>完形小侦探 · 前后都看看</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{font-family:"PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;background:#FFF9EF;color:#33261A;min-height:100vh}
+#app{max-width:680px;margin:0 auto;padding:18px 16px 40px}
+.hidden{display:none!important}
+.hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
+.logo{font-size:20px;font-weight:800;color:#33261A}
+.logo em{color:#E8703A;font-style:normal}
+.badges{display:flex;gap:6px}
+.badge{width:38px;height:38px;border-radius:50%;background:#F6EBD8;border:2px solid #EAD9BE;display:flex;align-items:center;justify-content:center;font-size:19px;opacity:.35;transition:all .4s}
+.badge.on{opacity:1;border-color:#E8703A;background:#fff;transform:scale(1.08)}
+.screen{background:#fff;border:3px solid #33261A;border-radius:22px;padding:26px 20px;box-shadow:0 6px 0 #EAD9BE}
+h1{font-size:30px;line-height:1.35;margin:10px 0 6px;text-align:center}
+.sub{text-align:center;color:#8A7A66;font-size:15px;line-height:1.8;margin-bottom:8px}
+.hero{text-align:center;font-size:64px;margin:14px 0 4px}
+.btn{display:block;width:100%;max-width:320px;margin:18px auto 6px;padding:16px 22px;font-size:19px;font-weight:800;color:#fff;background:#E8703A;border:none;border-radius:999px;box-shadow:0 5px 0 #B54E21;cursor:pointer;transition:transform .08s}
+.btn:active{transform:translateY(4px);box-shadow:0 1px 0 #B54E21}
+.btn.green{background:#3F7A5A;box-shadow:0 5px 0 #2C5840}
+.btn.green:active{box-shadow:0 1px 0 #2C5840}
+.hud{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
+.lvname{font-size:15px;font-weight:800;color:#3F7A5A;background:#EAF3ED;border-radius:999px;padding:6px 14px}
+.progress{font-size:14px;color:#8A7A66}
+.coach{display:flex;gap:10px;align-items:flex-start;background:#F6EBD8;border-radius:16px;padding:12px 14px;margin-bottom:14px;min-height:64px}
+.coach .face{font-size:30px;flex:none}
+.coach .bubble{font-size:15px;line-height:1.7}
+.sentence{background:#FFF9EF;border:2px dashed #EAD9BE;border-radius:16px;padding:22px 16px;margin-bottom:14px;text-align:center}
+.arrowhint{display:flex;justify-content:space-between;font-size:13px;color:#E8703A;font-weight:700;margin-bottom:10px}
+.stext{font-size:22px;line-height:2;font-weight:700}
+.slot{display:inline-block;min-width:64px;padding:0 10px;margin:0 4px;border-bottom:4px solid #E8703A;color:#E8703A;text-align:center;transition:all .3s}
+.slot.filled{color:#3F7A5A;border-bottom-color:#3F7A5A;animation:pop .45s}
+@keyframes pop{0%{transform:scale(.4)}60%{transform:scale(1.25)}100%{transform:scale(1)}}
+.chips{display:flex;flex-direction:column;gap:10px;margin-top:6px}
+.chip{padding:15px 18px;font-size:19px;font-weight:800;color:#33261A;background:#fff;border:3px solid #33261A;border-radius:999px;box-shadow:0 4px 0 #EAD9BE;cursor:pointer;transition:transform .08s}
+.chip:active{transform:translateY(3px);box-shadow:0 1px 0 #EAD9BE}
+.chip.lit{background:#3F7A5A;color:#fff;border-color:#2C5840;box-shadow:0 4px 0 #2C5840;animation:pop .45s}
+.chip.dead{opacity:.35;pointer-events:none}
+.chip.shake{animation:shake .4s}
+@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-8px)}75%{transform:translateX(8px)}}
+.tiplabel{text-align:center;font-size:13px;color:#8A7A66;margin-top:12px}
+#overlay{position:fixed;inset:0;background:rgba(51,38,26,.55);display:flex;align-items:center;justify-content:center;padding:20px;z-index:50}
+.ovcard{background:#FFF9EF;border-radius:22px;border:3px solid #33261A;padding:28px 22px;max-width:420px;width:100%;text-align:center;box-shadow:0 8px 0 rgba(0,0,0,.2)}
+.ovcard .big{font-size:64px;margin:6px 0}
+.ovcard h2{font-size:24px;margin-bottom:8px}
+.ovcard p{font-size:15px;color:#8A7A66;line-height:1.8}
+.cert{border:4px double #E8703A;border-radius:18px;padding:24px 18px;background:#FFFDF6;text-align:center;margin-top:8px}
+.cert .cicon{font-size:56px}
+.cert h2{font-size:24px;color:#E8703A;margin:8px 0 2px}
+.cert .cname{font-size:19px;font-weight:800;margin:6px 0}
+.cert .cline{font-size:14px;color:#8A7A66;line-height:1.9}
+.cert .cbadges{font-size:30px;letter-spacing:8px;margin:10px 0}
+.stats{display:flex;justify-content:center;gap:18px;margin:12px 0;font-size:14px;color:#3F7A5A;font-weight:700}
+.foot{text-align:center;font-size:12px;color:#8A7A66;margin-top:18px}
+</style>
+</head>
+<body>
+<div id="app">
+  <div class="hdr">
+    <div class="logo">完形<em>小侦探</em> · 前后都看看</div>
+    <div class="badges">
+      <div class="badge" id="badge0">🧩</div>
+      <div class="badge" id="badge1">🔍</div>
+      <div class="badge" id="badge2">👑</div>
+    </div>
+  </div>
+
+  <!-- 开始页 -->
+  <div class="screen" id="scr-start">
+    <div class="hero">🕵️📖</div>
+    <h1>遮住一个词，<br>你能猜回来吗？</h1>
+    <p class="sub">2018 年，AI 小 B（BERT）靠玩「完形填空」<br>横扫 11 项阅读比赛冠军。<br>它的秘诀只有一句：<b>先看看左边，再看看右边。</b><br>小心！有些词只看左边会猜错——<br>那是专门骗「只读一半」的小陷阱。</p>
+    <button class="btn" id="btn-start">开始破案 🔎</button>
+    <p class="tiplabel">闯关成功可获「BERT 双向阅读大师证书」</p>
+  </div>
+
+  <!-- 游戏页 -->
+  <div class="screen hidden" id="scr-game">
+    <div class="hud">
+      <div class="lvname" id="lvname">第一关 · 一眼看穿</div>
+      <div class="progress" id="progress">1 / 4</div>
+    </div>
+    <div class="coach">
+      <div class="face">🤖</div>
+      <div class="bubble" id="coach">我是小 B，最爱玩完形填空！空格两边都是线索，先看左边，再看右边！</div>
+    </div>
+    <div class="sentence">
+      <div class="arrowhint"><span>👈 先看左边</span><span>再看右边 👉</span></div>
+      <div class="stext"><span id="before"></span><span class="slot" id="slot">？</span><span id="after"></span></div>
+    </div>
+    <div class="chips">
+      <button class="chip" id="chip0"></button>
+      <button class="chip" id="chip1"></button>
+      <button class="chip" id="chip2"></button>
+    </div>
+    <button class="btn green hidden" id="btn-next">下一题 ➜</button>
+  </div>
+
+  <!-- 过关弹层 -->
+  <div id="overlay" class="hidden">
+    <div class="ovcard">
+      <div class="big" id="ov-icon">🧩</div>
+      <h2 id="ov-title">填空新星到手！</h2>
+      <p id="ov-text">简单空格一眼看穿，热身完成！</p>
+      <button class="btn" id="btn-continue">进入下一关 🚀</button>
+    </div>
+  </div>
+
+  <!-- 证书页 -->
+  <div class="screen hidden" id="scr-cert">
+    <div class="cert">
+      <div class="cicon">🏅</div>
+      <h2>BERT 双向阅读大师证书</h2>
+      <div class="cname">授予：完形小侦探</div>
+      <div class="cline">你会遮住一个词，<b>先看看左边，再看看右边</b>，<br>把线索都用上——这正是 2018 年 BERT<br>横扫 11 项阅读冠军的本领！</div>
+      <div class="cbadges">🧩 🔍 👑</div>
+      <div class="stats"><span id="st-hits"></span><span id="st-miss"></span></div>
+    </div>
+    <button class="btn" id="btn-again">再玩一次 🔁</button>
+    <p class="tiplabel">截图发到群里，领取你的电子奖状！</p>
+  </div>
+
+  <div class="foot">和孩子一起学AI · AI十哲 第八课《BERT》</div>
+</div>
+<div id="testlog" style="display:none"></div>
+<script>
+(function(){
+"use strict";
+var AUTO = location.search.indexOf('autotest') >= 0;
+var D = function(ms){ return AUTO ? 20 : ms; };
+var timers = [];
+function later(fn,ms){ timers.push(setTimeout(fn, D(ms))); }
+function clearTimers(){ for(var i=0;i<timers.length;i++) clearTimeout(timers[i]); timers=[]; }
+function $(id){ return document.getElementById(id); }
+
+var LEVELS = [
+  { name:'第一关 · 一眼看穿', badge:'🧩', badgeName:'填空新星',
+    ov:'简单的空格，一眼就穿帮——热身完成！下一关，会出现专门骗「只看左边」的陷阱词。',
+    rounds:[
+      {b:'弟弟把', a:'种在花盆里，每天浇水。', c:['种子','金鱼','铅笔'], ans:0, trap:1,
+       why:'左边「种在花盆」，右边「每天浇水」——两边都指向种子！',
+       trapTip:'金鱼不能种在花盆里哦——右边说要「浇水」，那是植物才需要的！'},
+      {b:'小明用', a:'把苹果切成两半。', c:['水果刀','毛巾','彩虹'], ans:0, trap:1,
+       why:'左边「用」要接工具，右边「切成两半」——水果刀，锁定！',
+       trapTip:'毛巾也能拿在手里，可把苹果「切成两半」得用刀——右边的线索别漏掉！'},
+      {b:'下雨了，小兔撑起', a:'，一蹦一跳往家跑。', c:['雨伞','桌子','饼干'], ans:0, trap:1,
+       why:'左边「下雨了」「撑起」，右边「往家跑」——当然是雨伞！',
+       trapTip:'桌子也能撑起来，可左边说「下雨了」——要的是挡雨的东西！'},
+      {b:'妹妹困了，钻进', a:'，很快就睡着了。', c:['被窝','鱼缸','书包'], ans:0, trap:1,
+       why:'左边「困了」「钻进」，右边「睡着了」——被窝最舒服！',
+       trapTip:'鱼缸是小鱼的家——右边说「睡着了」，要找睡觉的地方！'}
+    ]},
+  { name:'第二关 · 前后夹击', badge:'🔍', badgeName:'语境侦探',
+    ov:'陷阱词再也骗不到你——左边看看、右边看看，答案被两边夹得死死的！',
+    rounds:[
+      {b:'弟弟把', a:'种在花盆里，每天浇水，盼着它发芽。', c:['糖果','种子','沙发'], ans:1, trap:0,
+       why:'左边「种糖果」好像也行？右边「盼着它发芽」一出手——只有种子会发芽！',
+       trapTip:'「种糖果」左边读着挺顺，可右边说「发芽」——糖果永远不发芽！这就是只看一半的陷阱。'},
+      {b:'姐姐画了一只', a:'，它正展开翅膀飞向蓝天。', c:['金鱼','小鸟','卡车'], ans:1, trap:0,
+       why:'左边「画了一只」什么都行，右边「翅膀」「飞向蓝天」——锁定小鸟！',
+       trapTip:'「画了一只金鱼」左边完全没问题！可金鱼没有翅膀——右边一句话就把它否决了。'},
+      {b:'妈妈倒了一杯', a:'，让感冒的妹妹趁热喝。', c:['果汁','姜汤','枕头'], ans:1, trap:0,
+       why:'右边「感冒」「趁热喝」——热乎乎的姜汤才对！',
+       trapTip:'「倒了一杯果汁」左边通顺得很！可果汁不用「趁热喝」——右边的线索一出手，答案就变了。'},
+      {b:'小猴子把香蕉藏在', a:'里，留着冬天慢慢吃。', c:['肚子','树洞','云朵'], ans:1, trap:0,
+       why:'左边「藏在肚子里」挺顺？右边「留着冬天慢慢吃」——吃进肚子就留不住啦，是树洞！',
+       trapTip:'「藏在肚子里」左边能读通，可右边说「留着冬天慢慢吃」——前后夹击，锁定树洞！'}
+    ]},
+  { name:'第三关 · 完形侦探', badge:'👑', badgeName:'完形大师',
+    ov:'',
+    rounds:[
+      {b:'虽然外面下着大雨，快递员叔叔还是把包裹', a:'地送到了我们家门口。', c:['慢吞吞','准时','香喷喷'], ans:1, trap:0,
+       why:'「虽然……还是」在转弯：下大雨也没耽误——是「准时」！',
+       trapTip:'「慢吞吞」左边能读，可句子左边还有「虽然……还是」在转弯——连起来读，是在夸叔叔快！'},
+      {b:'这道数学题太难了，小明想了半天，终于在', a:'的帮助下算出了答案。', c:['糖果','草稿纸','恐龙'], ans:1, trap:0,
+       why:'左边「数学题」「想了半天」，右边「算出了答案」——草稿纸帮得上忙！',
+       trapTip:'糖果能让人开心，可帮不上「算出答案」——左右两边都在说「做题」这件事！'},
+      {b:'消防员叔叔冲进', a:'的房子，救出了被困的小猫。', c:['干净','着火','饼干做'], ans:1, trap:0,
+       why:'左边「消防员」「冲进」，右边「救出被困的小猫」——着火的房子才需要冲进去！',
+       trapTip:'「干净的房子」左边读着没事，可右边有「被困的小猫」——消防员冲进去，一定是着火了！'}
+    ]}
+];
+
+var S = { scr:'start', level:0, round:0, phase:'idle', answer:-1, trap:-1,
+          hits:0, mistakes:0, badges:[], done:false, overlay:false };
+
+function syncDBG(){
+  window.__DBG = { state:function(){ return {
+    scr:S.scr, level:S.level, round:S.round, phase:S.phase,
+    answer:S.answer, trap:S.trap, hits:S.hits, mistakes:S.mistakes,
+    badges:S.badges.slice(), done:S.done, overlay:S.overlay }; } };
+}
+
+function typeBubble(el, text){
+  clearTimers();
+  if(AUTO){ el.textContent = text; return; }
+  el.textContent = '';
+  var i = 0;
+  (function tick(){
+    if(i <= text.length){ el.textContent = text.slice(0, i); i++; later(tick, 28); }
+  })();
+}
+
+function show(id){ $(id).classList.remove('hidden'); }
+function hide(id){ $(id).classList.add('hidden'); }
+
+function loadRound(){
+  var L = LEVELS[S.level], R = L.rounds[S.round];
+  S.phase = 'pick'; S.answer = R.ans; S.trap = R.trap; S.overlay = false;
+  $('lvname').textContent = L.name;
+  $('progress').textContent = (S.round+1) + ' / ' + L.rounds.length;
+  $('before').textContent = R.b;
+  $('after').textContent = R.a;
+  var slot = $('slot');
+  slot.textContent = '？'; slot.classList.remove('filled');
+  for(var i=0;i<3;i++){
+    var ch = $('chip'+i);
+    ch.textContent = R.c[i];
+    ch.classList.remove('lit','dead','shake');
+  }
+  hide('btn-next');
+  typeBubble($('coach'), S.round===0 ? '小 B 提示：别急着猜！先看左边 👈 再看右边 👉' : '继续夹击：左边看看，右边看看！');
+  syncDBG();
+}
+
+function pick(i){
+  if(S.scr !== 'game' || S.phase !== 'pick') return;
+  var L = LEVELS[S.level], R = L.rounds[S.round];
+  var ch = $('chip'+i);
+  if(ch.classList.contains('dead')) return;
+  if(i === S.answer){
+    S.phase = 'reveal'; S.hits++;
+    ch.classList.add('lit');
+    var slot = $('slot');
+    slot.textContent = R.c[i]; slot.classList.add('filled');
+    for(var k=0;k<3;k++) if(k!==i) $('chip'+k).classList.add('dead');
+    typeBubble($('coach'), '🎉 答对了！' + R.why);
+    later(function(){ show('btn-next'); }, 500);
+  } else {
+    S.mistakes++;
+    if(i === S.trap){
+      typeBubble($('coach'), '⚠️ 陷阱词！' + R.trapTip);
+    } else {
+      typeBubble($('coach'), '😆 这个词两边都不搭！再读一遍句子，左边右边都看看。');
+    }
+    ch.classList.add('shake');
+    later(function(){ ch.classList.remove('shake'); ch.classList.add('dead'); }, 420);
+  }
+  syncDBG();
+}
+
+function next(){
+  if(S.scr !== 'game' || S.phase !== 'reveal') return;
+  var L = LEVELS[S.level];
+  S.round++;
+  if(S.round >= L.rounds.length){
+    // 过关
+    S.badges.push(L.badge);
+    $('badge'+S.level).classList.add('on');
+    if(S.level >= LEVELS.length-1){
+      S.done = true; S.scr = 'cert';
+      hide('scr-game'); show('scr-cert');
+      $('st-hits').textContent = '✅ 答对 ' + S.hits + ' 题';
+      $('st-miss').textContent = '🕳️ 踩陷阱 ' + S.mistakes + ' 次';
+    } else {
+      S.overlay = true;
+      $('ov-icon').textContent = L.badge;
+      $('ov-title').textContent = L.badgeName + '到手！';
+      $('ov-text').textContent = L.ov;
+      show('overlay');
+    }
+  } else {
+    loadRound();
+  }
+  syncDBG();
+}
+
+function cont(){
+  if(!$('overlay') || $('overlay').classList.contains('hidden')) return;
+  hide('overlay');
+  S.overlay = false;
+  S.level++; S.round = 0;
+  loadRound();
+}
+
+function start(){
+  S.scr = 'game'; S.level = 0; S.round = 0;
+  S.hits = 0; S.mistakes = 0; S.badges = []; S.done = false; S.overlay = false;
+  hide('scr-start'); hide('scr-cert'); show('scr-game');
+  for(var i=0;i<3;i++) $('badge'+i).classList.remove('on');
+  loadRound();
+}
+
+function resetAll(){
+  S.scr='start'; S.level=0; S.round=0; S.phase='idle'; S.answer=-1; S.trap=-1;
+  S.hits=0; S.mistakes=0; S.badges=[]; S.done=false; S.overlay=false;
+  clearTimers();
+  hide('scr-game'); hide('scr-cert'); hide('overlay'); show('scr-start');
+  for(var i=0;i<3;i++) $('badge'+i).classList.remove('on');
+  syncDBG();
+}
+
+function softRestart(){ try{ location.reload(); }catch(e){} setTimeout(resetAll, 400); }
+
+$('btn-start').addEventListener('click', start);
+$('btn-next').addEventListener('click', next);
+$('btn-continue').addEventListener('click', cont);
+$('btn-again').addEventListener('click', softRestart);
+for(var i=0;i<3;i++){
+  (function(idx){ $('chip'+idx).addEventListener('click', function(){ pick(idx); }); })(i);
+}
+syncDBG();
+})();
+</script>
+</body>
+</html>
